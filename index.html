@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Empty-Bus</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+    <!-- Tela: login e cadastro (#login) -->
+    <main id="screen-login" class="app-container auth-screen" hidden>
+        <header class="auth-header">
+            <div class="auth-logo"><i class="fa-solid fa-bus"></i></div>
+            <h1>Empty-Bus</h1>
+            <p>Acompanhe suas linhas em tempo real</p>
+        </header>
+
+        <div class="auth-card">
+            <div class="tabs" role="tablist">
+                <button type="button" class="tab active" role="tab" id="tab-login" aria-selected="true" aria-controls="form-login">Entrar</button>
+                <button type="button" class="tab" role="tab" id="tab-register" aria-selected="false" aria-controls="form-register">Cadastrar</button>
+            </div>
+
+            <p id="auth-message" class="auth-message" role="status" aria-live="polite" hidden></p>
+
+            <!-- LOGIN -->
+            <form id="form-login" class="auth-form" role="tabpanel" aria-labelledby="tab-login" novalidate>
+                <div class="field">
+                    <label for="login-email">E-mail</label>
+                    <input type="email" id="login-email" name="email" autocomplete="email" placeholder="voce@email.com" required>
+                    <small class="error" data-error-for="email"></small>
+                </div>
+
+                <div class="field">
+                    <label for="login-password">Senha</label>
+                    <div class="password-wrap">
+                        <input type="password" id="login-password" name="password" autocomplete="current-password" placeholder="Sua senha" required>
+                        <button type="button" class="toggle-pass" aria-label="Mostrar senha"><i class="fa-regular fa-eye"></i></button>
+                    </div>
+                    <small class="error" data-error-for="password"></small>
+                </div>
+
+                <label class="remember">
+                    <input type="checkbox" name="remember"> Manter conectado
+                </label>
+
+                <small class="error form-error" data-error-for="form"></small>
+                <button type="submit" class="submit-btn">Entrar</button>
+            </form>
+
+            <!-- CADASTRO -->
+            <form id="form-register" class="auth-form" role="tabpanel" aria-labelledby="tab-register" novalidate hidden>
+                <div class="field">
+                    <label for="reg-name">Nome</label>
+                    <input type="text" id="reg-name" name="name" autocomplete="name" placeholder="Seu nome" required>
+                    <small class="error" data-error-for="name"></small>
+                </div>
+
+                <div class="field">
+                    <label for="reg-email">E-mail</label>
+                    <input type="email" id="reg-email" name="email" autocomplete="email" placeholder="voce@email.com" required>
+                    <small class="error" data-error-for="email"></small>
+                </div>
+
+                <div class="field">
+                    <label for="reg-password">Senha</label>
+                    <div class="password-wrap">
+                        <input type="password" id="reg-password" name="password" autocomplete="new-password" placeholder="Mínimo 8 caracteres, letras e números" required>
+                        <button type="button" class="toggle-pass" aria-label="Mostrar senha"><i class="fa-regular fa-eye"></i></button>
+                    </div>
+                    <small class="error" data-error-for="password"></small>
+                </div>
+
+                <div class="field">
+                    <label for="reg-confirm">Confirmar senha</label>
+                    <input type="password" id="reg-confirm" name="confirm" autocomplete="new-password" placeholder="Repita a senha" required>
+                    <small class="error" data-error-for="confirm"></small>
+                </div>
+
+                <small class="error form-error" data-error-for="form"></small>
+                <button type="submit" class="submit-btn">Criar conta</button>
+            </form>
+        </div>
+    </main>
+
+    <!-- Telas: próximos ônibus (#inicio) e linhas de ônibus (#linhas) -->
+    <div id="screen-app" class="app-container main-screen" hidden>
+
+        <!-- Tela: Próximos ônibus -->
+        <section id="view-home">
+            <header class="app-header">
+                <div class="user-info">
+                    <h1>Olá, usuário!</h1>
+                    <p>Para onde você quer ir hoje?</p>
+                </div>
+                <div class="header-actions">
+                    <a href="#config" class="user-avatar" title="Configurações" aria-label="Configurações"><i class="fa-solid fa-gear"></i></a>
+                    <a href="#perfil" class="user-avatar" title="Perfil" aria-label="Perfil"><i class="fa-solid fa-user"></i></a>
+                </div>
+            </header>
+
+            <label class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="search" id="q-home" placeholder="Buscar endereço, linha de ônibus..." aria-label="Buscar endereço ou linha de ônibus">
+            </label>
+
+            <div class="actions-grid">
+                <a href="#mapa" class="action-card">
+                    <i class="fa-solid fa-location-dot"></i>
+                    <h3>Buscar no mapa</h3>
+                    <p>Encontre pontos próximos</p>
+                </a>
+                <a href="#linhas" class="action-card">
+                    <i class="fa-solid fa-bus"></i>
+                    <h3>Linhas de ônibus</h3>
+                    <p>Veja horários e itinerários</p>
+                </a>
+            </div>
+
+            <section class="bus-section">
+                <div class="section-header">
+                    <h2>Próximos ônibus</h2>
+                    <a href="#linhas" class="see-all">Ver todos</a>
+                </div>
+                <div class="bus-list" id="list-home" aria-live="polite"></div>
+            </section>
+
+            <a href="#mapa" class="footer-banner">
+                <i class="fa-solid fa-bus-simple"></i>
+                <span>
+                    <strong>Planeje sua viagem</strong>
+                    <small>Veja rotas, horários e quanto tempo vai levar</small>
+                </span>
+            </a>
+        </section>
+
+        <!-- Tela: Linhas de ônibus -->
+        <section id="view-lines" hidden>
+            <header class="topbar">
+                <a href="#inicio" class="back" aria-label="Voltar"><i class="fa-solid fa-arrow-left"></i></a>
+                <h1>Linhas de ônibus</h1>
+            </header>
+
+            <label class="search-box">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="search" id="q-lines" placeholder="Buscar linhas, destinos ou região..." aria-label="Buscar linhas, destinos ou região">
+            </label>
+
+            <div class="chips" id="chips">
+                <button type="button" class="chip" data-f="all" aria-pressed="true">Todas</button>
+                <button type="button" class="chip" data-f="near" aria-pressed="false">Mais próximos</button>
+                <button type="button" class="chip" data-f="fav" aria-pressed="false">Favoritos</button>
+            </div>
+
+            <div class="bus-list" id="list-lines" aria-live="polite"></div>
+        </section>
+
+    </div>
+
+    <!-- Ícones (sprite) das telas de configurações e perfil -->
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></symbol>
+  <symbol id="lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></symbol>
+  <symbol id="bell" viewBox="0 0 24 24"><path d="M6 16v-5a6 6 0 0112 0v5l2 2H4z"/><path d="M10 20a2 2 0 004 0"/></symbol>
+  <symbol id="pal" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="8" cy="11" r="1"/><circle cx="12" cy="7.5" r="1"/><circle cx="16" cy="11" r="1"/></symbol>
+  <symbol id="globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></symbol>
+  <symbol id="pin" viewBox="0 0 24 24"><path d="M12 21s7-6 7-11a7 7 0 10-14 0c0 5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+  <symbol id="help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 115 0c0 2-2.5 2-2.5 4"/><path d="M12 17h.01"/></symbol>
+  <symbol id="chat" viewBox="0 0 24 24"><path d="M4 5h16v11H9l-5 4z"/><path d="M8 10h8"/></symbol>
+  <symbol id="info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol>
+  <symbol id="out" viewBox="0 0 24 24"><path d="M10 4H5v16h5M15 8l4 4-4 4M19 12H9"/></symbol>
+  <symbol id="chev" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></symbol>
+  <symbol id="back" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+  <symbol id="star" viewBox="0 0 24 24"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></symbol>
+  <symbol id="cam" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><circle cx="12" cy="13" r="3.5"/><path d="M8 7l1.5-3h5L16 7"/></symbol>
+  <symbol id="mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></symbol>
+  <symbol id="phone" viewBox="0 0 24 24"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 005 5L15 13l5 2v4a2 2 0 01-2 2A16 16 0 013 6a2 2 0 012-2z"/></symbol>
+  <symbol id="edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></symbol>
+</svg>
+
+    <!-- Tela: Configurações (#config) -->
+    <main id="screen-config" class="app-container cf" hidden>
+        <header class="cf-hd">
+            <a class="cf-hb l" href="#inicio" aria-label="Voltar"><svg aria-hidden="true"><use href="#back"/></svg></a>
+            <h2>Configurações</h2>
+        </header>
+        <section class="cf-sheet">
+            <h3 class="cf-s">Conta</h3>
+            <div class="cf-grp">
+                <a class="cf-row" href="#perfil"><span class="cf-ic"><svg aria-hidden="true"><use href="#user"/></svg></span><span class="cf-tx"><b>Perfil</b><small>Veja e edite suas informações</small></span><svg aria-hidden="true"><use href="#chev"/></svg></a>
+                <button class="cf-row" type="button" data-toast="Privacidade: em breve"><span class="cf-ic"><svg aria-hidden="true"><use href="#lock"/></svg></span><span class="cf-tx"><b>Privacidade</b><small>Gerencie seus dados</small></span><svg aria-hidden="true"><use href="#chev"/></svg></button>
+                <button class="cf-row" type="button" data-toast="Notificações: em breve"><span class="cf-ic"><svg aria-hidden="true"><use href="#bell"/></svg></span><span class="cf-tx"><b>Notificações</b><small>Escolha o que receber</small></span><svg aria-hidden="true"><use href="#chev"/></svg></button>
+            </div>
+
+            <h3 class="cf-s">Aplicativo</h3>
+            <div class="cf-grp">
+                <label class="cf-row"><span class="cf-ic"><svg aria-hidden="true"><use href="#pal"/></svg></span><span class="cf-tx"><b>Modo escuro</b><small>Altere o tema do app</small></span><input type="checkbox" class="cf-sw" id="cf-dark"></label>
+                <button class="cf-row" type="button" data-toast="Por enquanto o app está disponível apenas em Português (BR)"><span class="cf-ic"><svg aria-hidden="true"><use href="#globe"/></svg></span><span class="cf-tx"><b>Idioma</b><small>Português (BR)</small></span><svg aria-hidden="true"><use href="#chev"/></svg></button>
+                <label class="cf-row"><span class="cf-ic"><svg aria-hidden="true"><use href="#pin"/></svg></span><span class="cf-tx"><b>Localização</b><small>Permita o acesso ao seu local</small></span><input type="checkbox" class="cf-sw" id="cf-loc" checked></label>
+            </div>
+
+            <h3 class="cf-s">Suporte</h3>
+            <div class="cf-grp">
+                <button class="cf-row" type="button" data-toast="Ajuda: em breve"><span class="cf-ic"><svg aria-hidden="true"><use href="#help"/></svg></span><span class="cf-tx"><b>Ajuda</b><small>Tire suas dúvidas</small></span><svg aria-hidden="true"><use href="#chev"/></svg></button>
+                <button class="cf-row" type="button" data-toast="Fale conosco: em breve"><span class="cf-ic"><svg aria-hidden="true"><use href="#chat"/></svg></span><span class="cf-tx"><b>Fale conosco</b><small>Envie sua mensagem</small></span><svg aria-hidden="true"><use href="#chev"/></svg></button>
+                <button class="cf-row" type="button" data-toast="Empty-Bus - versão 1.0.0"><span class="cf-ic"><svg aria-hidden="true"><use href="#info"/></svg></span><span class="cf-tx"><b>Sobre o app</b><small>Versão 1.0.0</small></span><svg aria-hidden="true"><use href="#chev"/></svg></button>
+            </div>
+
+            <button type="button" class="cf-wide" id="logout-btn"><svg aria-hidden="true"><use href="#out"/></svg> Sair da conta</button>
+        </section>
+    </main>
+
+    <!-- Tela: Perfil (#perfil) -->
+    <main id="screen-perfil" class="app-container cf" hidden>
+        <header class="cf-hd">
+            <a class="cf-hb l" id="perfil-back" href="#config" aria-label="Voltar"><svg aria-hidden="true"><use href="#back"/></svg></a>
+            <h2>Perfil</h2>
+            <button type="button" class="cf-hb r" id="perfil-bell" aria-label="Notificações"><svg aria-hidden="true"><use href="#bell"/></svg></button>
+        </header>
+        <section class="cf-sheet">
+            <div class="cf-who">
+                <div class="cf-av">
+                    <svg id="perfil-icon" aria-hidden="true"><use href="#user"/></svg>
+                    <img id="perfil-img" alt="Foto do perfil" hidden>
+                    <button type="button" class="cf-cam" id="perfil-foto" aria-label="Alterar foto"><svg aria-hidden="true"><use href="#cam"/></svg></button>
+                    <input type="file" id="perfil-file" accept="image/*" hidden>
+                </div>
+                <div>
+                    <h4 id="perfil-nome"></h4>
+                    <p id="perfil-email"></p>
+                </div>
+            </div>
+
+            <div id="perfil-view">
+                <h3 class="cf-s">Minhas informações</h3>
+                <div class="cf-grp">
+                    <button class="cf-row" type="button" data-edit="name"><span class="cf-ic"><svg aria-hidden="true"><use href="#user"/></svg></span><span class="cf-tx"><b>Nome</b><small id="pv-name"></small></span><svg aria-hidden="true"><use href="#chev"/></svg></button>
+                    <button class="cf-row" type="button" data-toast="O e-mail da conta não pode ser alterado por aqui"><span class="cf-ic"><svg aria-hidden="true"><use href="#mail"/></svg></span><span class="cf-tx"><b>E-mail</b><small id="pv-email"></small></span><svg aria-hidden="true"><use href="#chev"/></svg></button>
+                    <button class="cf-row" type="button" data-edit="phone"><span class="cf-ic"><svg aria-hidden="true"><use href="#phone"/></svg></span><span class="cf-tx"><b>Telefone</b><small id="pv-phone"></small></span><svg aria-hidden="true"><use href="#chev"/></svg></button>
+                </div>
+
+                <h3 class="cf-s">Preferências</h3>
+                <div class="cf-grp">
+                    <a class="cf-row" href="#linhas?filtro=fav"><span class="cf-ic"><svg aria-hidden="true"><use href="#star"/></svg></span><span class="cf-tx"><b>Linhas favoritas</b><small>Gerencie suas linhas preferidas</small></span><svg aria-hidden="true"><use href="#chev"/></svg></a>
+                    <button class="cf-row" type="button" data-edit="address"><span class="cf-ic"><svg aria-hidden="true"><use href="#pin"/></svg></span><span class="cf-tx"><b>Endereço padrão</b><small id="pv-address"></small></span><svg aria-hidden="true"><use href="#chev"/></svg></button>
+                </div>
+
+                <button type="button" class="cf-wide" id="perfil-edit"><svg aria-hidden="true"><use href="#edit"/></svg> Editar perfil</button>
+            </div>
+
+            <form id="perfil-form" class="cf-form" novalidate hidden>
+                <h3 class="cf-s">Editar perfil</h3>
+                <div class="cf-field"><label for="pf-name">Nome</label><input id="pf-name" type="text" autocomplete="name" maxlength="60"></div>
+                <div class="cf-field"><label for="pf-email">E-mail</label><input id="pf-email" type="email" disabled></div>
+                <div class="cf-field"><label for="pf-phone">Telefone</label><input id="pf-phone" type="tel" autocomplete="tel" inputmode="tel" placeholder="(81) 91234-5678" maxlength="20"></div>
+                <div class="cf-field"><label for="pf-address">Endereço padrão</label><input id="pf-address" type="text" autocomplete="street-address" placeholder="Rua, número, bairro" maxlength="120"></div>
+                <small class="cf-err" id="pf-err" role="alert"></small>
+                <div class="cf-actions">
+                    <button type="button" class="cf-wide ghost" id="pf-cancel">Cancelar</button>
+                    <button type="submit" class="cf-wide solid">Salvar</button>
+                </div>
+            </form>
+        </section>
+    </main>
+
+    <!-- Tela: detalhe da linha / reportar lotação (#linha?linha=201) - montada por JS -->
+    <main id="screen-bus" class="app-container bd-screen" hidden></main>
+
+    <!-- Tela: mapa (#mapa) -->
+    <div id="screen-map" class="app-container map-screen" hidden>
+        <div class="map-view">
+            <div class="map-placeholder"></div>
+            <div class="floating-search-bar">
+                <a href="#inicio" class="back-btn">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </a>
+                <input type="text" placeholder="Buscar endereço, linha de ônibus...">
+                <button class="clear-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="floating-controls">
+                <button class="control-btn"><i class="fa-solid fa-location-crosshairs"></i></button>
+                <button class="control-btn"><i class="fa-solid fa-layer-group"></i></button>
+            </div>
+        </div>
+        <div class="bottom-sheet">
+            <div class="drag-handle"></div>
+            <div class="bottom-actions-grid">
+                <button class="sheet-button">
+                    <i class="fa-regular fa-star"></i> favoritos
+                </button>
+                <button class="sheet-button">
+                    <i class="fa-solid fa-bus"></i> Paradas
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+    <script src="js/login.js"></script>
+    <script src="js/linhas.js"></script>
+    <script src="js/mapa.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/rotas.js"></script>
+</body>
+</html>
